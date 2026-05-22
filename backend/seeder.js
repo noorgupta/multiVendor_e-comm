@@ -13,7 +13,26 @@ const seedProducts = async () => {
     await Product.deleteMany({});
     console.log('Old products deleted...');
 
-    await Product.insertMany(products);
+    const User = require('./models/User');
+    const adminUser = await User.findOne({ role: 'admin' });
+    
+    // If no admin user exists, just get any user or create one
+    let vendorId = null;
+    if (adminUser) {
+      vendorId = adminUser._id;
+    } else {
+      const anyUser = await User.findOne({});
+      if (anyUser) {
+        vendorId = anyUser._id;
+      } else {
+         // Create a dummy user if none exists
+         const dummyUser = await User.create({ name: 'Admin', email: 'admin@test.com', password: 'password', role: 'admin' });
+         vendorId = dummyUser._id;
+      }
+    }
+
+    const seededProducts = products.map((p) => ({ ...p, vendor: vendorId }));
+    await Product.insertMany(seededProducts);
     console.log('Products seeded successfully!');
 
     process.exit(0);

@@ -66,17 +66,23 @@ const getCart = async (req, res) => {
       .find({ user: userId })
       .populate('product');
 
-    const total = cartItems.reduce((acc, item) => {
+    const validCartItems = [];
+    for (const item of cartItems) {
       if (item.product) {
-        return acc + item.product.price * item.quantity;
+        validCartItems.push(item);
+      } else {
+        await Cart.deleteOne({ _id: item._id });
       }
-      return acc;
+    }
+
+    const total = validCartItems.reduce((acc, item) => {
+      return acc + item.product.price * item.quantity;
     }, 0);
 
     res.status(200).json({
-      cartItems,
+      cartItems: validCartItems,
       total,
-      itemCount: cartItems.length,
+      itemCount: validCartItems.length,
     });
   } catch (error) {
     console.log('GET CART ERROR:', error.message);

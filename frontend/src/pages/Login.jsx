@@ -42,140 +42,61 @@ function Login() {
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.box}>
-        <h2 style={styles.heading}>👋 Welcome Back!</h2>
-        <p style={styles.subheading}>Login to access your cart</p>
+    <div className="page-center">
+      <div className="form-container" style={{ margin: '0' }}>
+        <h2 className="heading-2 text-center" style={{ marginBottom: '0.5rem' }}>👋 Welcome Back!</h2>
+        <p className="text-center text-muted mb-3">Login to access your cart</p>
 
-        {error && <p style={styles.error}>{error}</p>}
+        {error && (
+          <div className="mb-3 p-2 text-center" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', borderRadius: 'var(--radius-sm)' }}>
+            {error}
+          </div>
+        )}
 
-        <div style={styles.form}>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Email</label>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Email</label>
             <input
               type='email'
               placeholder='Enter your email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              style={styles.input}
+              className="form-input"
+              required
             />
           </div>
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Password</label>
+          <div className="form-group">
+            <label className="form-label">Password</label>
             <input
               type='password'
               placeholder='Enter your password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              style={styles.input}
+              className="form-input"
+              required
             />
           </div>
 
           <button
-            onClick={handleSubmit}
-            style={{
-              ...styles.btn,
-              opacity: loading ? 0.7 : 1,
-            }}
+            type="submit"
+            className="btn btn-primary mt-2"
+            style={{ width: '100%', opacity: loading ? 0.7 : 1 }}
             disabled={loading}
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
-        </div>
+        </form>
 
-        <p style={styles.bottomText}>
+        <p className="text-center text-muted mt-4" style={{ fontSize: '0.9rem' }}>
           Don't have an account?{' '}
-          <Link to='/register' style={styles.link}>
+          <Link to='/register' style={{ color: 'var(--primary)', fontWeight: '600' }}>
             Register here
           </Link>
         </p>
       </div>
     </div>
   )
-}
-
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    backgroundColor: '#0f3460',
-  },
-  box: {
-    backgroundColor: '#16213e',
-    padding: '50px',
-    borderRadius: '20px',
-    width: '400px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-  },
-  heading: {
-    color: 'white',
-    fontSize: '28px',
-    marginBottom: '8px',
-    textAlign: 'center',
-  },
-  subheading: {
-    color: '#a8a8b3',
-    fontSize: '14px',
-    textAlign: 'center',
-    marginBottom: '30px',
-  },
-  error: {
-    backgroundColor: '#e9456020',
-    color: '#e94560',
-    padding: '10px',
-    borderRadius: '8px',
-    marginBottom: '15px',
-    fontSize: '14px',
-    textAlign: 'center',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-  },
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  label: {
-    color: '#a8a8b3',
-    fontSize: '14px',
-  },
-  input: {
-    padding: '12px 15px',
-    borderRadius: '8px',
-    border: '1px solid #a8a8b330',
-    backgroundColor: '#0f3460',
-    color: 'white',
-    fontSize: '14px',
-    outline: 'none',
-  },
-  btn: {
-    backgroundColor: '#e94560',
-    color: 'white',
-    border: 'none',
-    padding: '14px',
-    borderRadius: '10px',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    marginTop: '10px',
-  },
-  bottomText: {
-    color: '#a8a8b3',
-    textAlign: 'center',
-    marginTop: '25px',
-    fontSize: '14px',
-  },
-  link: {
-    color: '#e94560',
-    textDecoration: 'none',
-    fontWeight: 'bold',
-  },
 }
 
 export default Login

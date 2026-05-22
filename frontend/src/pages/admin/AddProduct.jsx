@@ -50,60 +50,64 @@ function AddProduct() {
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <Link to='/admin/products' style={styles.backBtn}>← Back</Link>
-        <h1 style={styles.heading}>➕ Add New Product</h1>
+    <div className="container" style={{ minHeight: 'calc(100vh - 70px)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '2rem' }}>
+        <Link to='/admin/products' className="text-muted" style={{ fontWeight: '600' }}>← Back</Link>
+        <h1 className="heading-2" style={{ margin: 0 }}>Add New Product</h1>
       </div>
 
-      <div style={styles.formBox}>
-        {error && <p style={styles.error}>{error}</p>}
-        {success && <p style={styles.success}>{success}</p>}
+      <div className="card" style={{ maxWidth: '700px', margin: '0 auto', padding: '2rem' }}>
+        {error && <div className="mb-3 p-2 text-center" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)', borderRadius: 'var(--radius-sm)' }}>{error}</div>}
+        {success && <div className="mb-3 p-2 text-center" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', borderRadius: 'var(--radius-sm)' }}>{success}</div>}
 
-        <div style={styles.form}>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Product Name</label>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label">Product Name</label>
             <input
               name='name'
               value={formData.name}
               onChange={handleChange}
               placeholder='Enter product name'
-              style={styles.input}
+              className="form-input"
+              required
             />
           </div>
 
-          <div style={styles.row}>
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>Price (₹)</label>
+          <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
+            <div className="form-group" style={{ flex: 1, minWidth: '150px', marginBottom: 0 }}>
+              <label className="form-label">Price (₹)</label>
               <input
                 name='price'
                 type='number'
                 value={formData.price}
                 onChange={handleChange}
                 placeholder='Enter price'
-                style={styles.input}
+                className="form-input"
+                required
               />
             </div>
-            <div style={styles.inputGroup}>
-              <label style={styles.label}>Stock</label>
+            <div className="form-group" style={{ flex: 1, minWidth: '150px', marginBottom: 0 }}>
+              <label className="form-label">Stock</label>
               <input
                 name='stock'
                 type='number'
                 value={formData.stock}
                 onChange={handleChange}
                 placeholder='Enter stock'
-                style={styles.input}
+                className="form-input"
+                required
               />
             </div>
           </div>
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Category</label>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label">Category</label>
             <select
               name='category'
               value={formData.category}
               onChange={handleChange}
-              style={styles.input}
+              className="form-input"
+              required
             >
               <option value='electronics'>Electronics</option>
               <option value='phones'>Phones</option>
@@ -113,14 +117,15 @@ function AddProduct() {
             </select>
           </div>
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Image URL</label>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label">Image URL</label>
             <input
               name='image'
               value={formData.image}
               onChange={handleChange}
               placeholder='Enter image URL'
-              style={styles.input}
+              className="form-input"
+              required
             />
           </div>
 
@@ -128,141 +133,36 @@ function AddProduct() {
             <img
               src={formData.image}
               alt='preview'
-              style={styles.imagePreview}
+              style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
               onError={(e) => e.target.style.display = 'none'}
             />
           )}
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Description</label>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label">Description</label>
             <textarea
               name='description'
               value={formData.description}
               onChange={handleChange}
               placeholder='Enter product description'
-              style={styles.textarea}
+              className="form-input"
               rows={4}
+              required
             />
           </div>
 
           <button
-            onClick={handleSubmit}
+            type="submit"
             disabled={loading}
-            style={{
-              ...styles.submitBtn,
-              opacity: loading ? 0.7 : 1,
-            }}
+            className="btn btn-primary mt-2"
+            style={{ width: '100%', opacity: loading ? 0.7 : 1 }}
           >
             {loading ? '⏳ Adding...' : '➕ Add Product'}
           </button>
-        </div>
+        </form>
       </div>
     </div>
   )
-}
-
-const styles = {
-  container: {
-    padding: '40px',
-    backgroundColor: '#0f3460',
-    minHeight: '100vh',
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px',
-    marginBottom: '30px',
-  },
-  backBtn: {
-    color: '#a8a8b3',
-    textDecoration: 'none',
-    fontSize: '16px',
-  },
-  heading: {
-    color: 'white',
-    fontSize: '28px',
-    margin: 0,
-  },
-  formBox: {
-    backgroundColor: '#16213e',
-    borderRadius: '15px',
-    padding: '40px',
-    maxWidth: '700px',
-    margin: '0 auto',
-    boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-  },
-  row: {
-    display: 'flex',
-    gap: '20px',
-  },
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    flex: 1,
-  },
-  label: {
-    color: '#a8a8b3',
-    fontSize: '14px',
-  },
-  input: {
-    padding: '12px 15px',
-    borderRadius: '8px',
-    border: '1px solid #a8a8b330',
-    backgroundColor: '#0f3460',
-    color: 'white',
-    fontSize: '14px',
-    outline: 'none',
-  },
-  textarea: {
-    padding: '12px 15px',
-    borderRadius: '8px',
-    border: '1px solid #a8a8b330',
-    backgroundColor: '#0f3460',
-    color: 'white',
-    fontSize: '14px',
-    outline: 'none',
-    resize: 'vertical',
-  },
-  imagePreview: {
-    width: '150px',
-    height: '150px',
-    objectFit: 'cover',
-    borderRadius: '10px',
-    border: '2px solid #a8a8b330',
-  },
-  submitBtn: {
-    backgroundColor: '#e94560',
-    color: 'white',
-    border: 'none',
-    padding: '14px',
-    borderRadius: '10px',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    marginTop: '10px',
-  },
-  error: {
-    backgroundColor: '#e9456020',
-    color: '#e94560',
-    padding: '10px',
-    borderRadius: '8px',
-    marginBottom: '15px',
-    fontSize: '14px',
-  },
-  success: {
-    backgroundColor: '#2ecc7120',
-    color: '#2ecc71',
-    padding: '10px',
-    borderRadius: '8px',
-    marginBottom: '15px',
-    fontSize: '14px',
-  },
 }
 
 export default AddProduct

@@ -26,10 +26,8 @@ function Orders() {
         `${import.meta.env.VITE_API_URL}/api/orders`,
         { headers: { Authorization: `Bearer ${token}` } }
       )
-      console.log('Orders:', response.data)
       setOrders(response.data.orders || [])
     } catch (error) {
-      console.log('Orders error:', error.response?.data)
       setError('Failed to load orders!')
     } finally {
       setLoading(false)
@@ -38,12 +36,12 @@ function Orders() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'pending': return '#f39c12'
-      case 'processing': return '#3498db'
-      case 'shipped': return '#9b59b6'
-      case 'delivered': return '#2ecc71'
-      case 'cancelled': return '#e94560'
-      default: return '#a8a8b3'
+      case 'pending': return '#f59e0b' // Amber
+      case 'processing': return '#3b82f6' // Blue
+      case 'shipped': return '#8b5cf6' // Purple
+      case 'delivered': return '#10b981' // Emerald
+      case 'cancelled': return '#ef4444' // Red
+      default: return '#9ca3af' // Gray
     }
   }
 
@@ -60,30 +58,30 @@ function Orders() {
 
   if (loading) {
     return (
-      <div style={styles.center}>
-        <h2 style={styles.message}>⏳ Loading orders...</h2>
+      <div className="page-center">
+        <h2 className="heading-2 text-muted">⏳ Loading orders...</h2>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div style={styles.center}>
-        <h2 style={styles.errorMsg}>{error}</h2>
+      <div className="page-center">
+        <h2 className="heading-2 text-error">{error}</h2>
       </div>
     )
   }
 
   if (orders.length === 0) {
     return (
-      <div style={styles.center}>
-        <div style={styles.emptyBox}>
-          <p style={styles.emptyIcon}>📦</p>
-          <h2 style={styles.emptyHeading}>No Orders Yet!</h2>
-          <p style={styles.emptyText}>
+      <div className="page-center">
+        <div className="form-container" style={{ margin: '0', textAlign: 'center', maxWidth: '500px' }}>
+          <p style={{ fontSize: '4rem', marginBottom: '1rem' }}>📦</p>
+          <h2 className="heading-2" style={{ marginBottom: '0.5rem' }}>No Orders Yet!</h2>
+          <p className="text-muted mb-4">
             You haven't placed any orders yet.
           </p>
-          <Link to='/' style={styles.shopBtn}>
+          <Link to='/' className="btn btn-primary" style={{ display: 'inline-block' }}>
             🛍️ Start Shopping
           </Link>
         </div>
@@ -92,22 +90,23 @@ function Orders() {
   }
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.heading}>
-        📦 My Orders ({orders.length})
+    <div className="container" style={{ minHeight: 'calc(100vh - 70px)' }}>
+      <h1 className="heading-1 text-center" style={{ marginBottom: '3rem' }}>
+        My Orders ({orders.length})
       </h1>
-      <div style={styles.ordersList}>
+      
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '800px', margin: '0 auto' }}>
         {orders.map((order) => (
-          <div key={order._id} style={styles.orderCard}>
+          <div key={order._id} className="card">
 
-            <div style={styles.orderHeader}>
+            <div className="flex-between" style={{ marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
               <div>
-                <p style={styles.orderId}>
-                  Order ID: <span style={styles.orderIdValue}>
+                <p className="text-muted" style={{ fontSize: '0.85rem', marginBottom: '0.25rem' }}>
+                  Order ID: <span style={{ color: 'var(--text-main)', fontWeight: '600', fontFamily: 'monospace', letterSpacing: '1px' }}>
                     #{order._id.slice(-8).toUpperCase()}
                   </span>
                 </p>
-                <p style={styles.orderDate}>
+                <p className="text-muted" style={{ fontSize: '0.85rem' }}>
                   📅 {new Date(order.createdAt).toLocaleDateString('en-IN', {
                     year: 'numeric',
                     month: 'long',
@@ -116,55 +115,62 @@ function Orders() {
                 </p>
               </div>
               <span style={{
-                ...styles.statusBadge,
+                padding: '0.35rem 0.8rem',
+                borderRadius: 'var(--radius-full)',
+                fontSize: '0.75rem',
+                fontWeight: '700',
+                letterSpacing: '0.05em',
                 backgroundColor: getStatusColor(order.orderStatus) + '20',
                 color: getStatusColor(order.orderStatus),
-                border: `1px solid ${getStatusColor(order.orderStatus)}`,
+                border: `1px solid ${getStatusColor(order.orderStatus)}40`,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem'
               }}>
                 {getStatusEmoji(order.orderStatus)} {order.orderStatus.toUpperCase()}
               </span>
             </div>
 
-            <div style={styles.divider} />
+            <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '1rem 0' }} />
 
-            <div style={styles.productsList}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {order.products.map((item, index) => (
-                <div key={index} style={styles.productRow}>
+                <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   {item.product ? (
                     <>
                       <img
                         src={item.product.image}
                         alt={item.product.name}
-                        style={styles.productImage}
+                        style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: 'var(--radius-sm)' }}
                         onError={(e) => {
-                          e.target.src = 'https://via.placeholder.com/60x60?text=No+Image'
+                          e.target.src = 'https://placehold.co/60x60/151A23/4f46e5?text=No+Image'
                         }}
                       />
-                      <div style={styles.productInfo}>
-                        <p style={styles.productName}>{item.product.name}</p>
-                        <p style={styles.productMeta}>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ color: 'var(--text-main)', fontSize: '0.95rem', fontWeight: '600', marginBottom: '0.15rem' }}>{item.product.name}</p>
+                        <p className="text-muted" style={{ fontSize: '0.85rem' }}>
                           Qty: {item.quantity} × ₹{item.price.toLocaleString()}
                         </p>
                       </div>
-                      <p style={styles.productTotal}>
+                      <p style={{ color: 'var(--text-main)', fontSize: '1rem', fontWeight: '700' }}>
                         ₹{(item.price * item.quantity).toLocaleString()}
                       </p>
                     </>
                   ) : (
-                    <p style={styles.deletedProduct}>Product no longer available</p>
+                    <p className="text-muted" style={{ fontStyle: 'italic', fontSize: '0.9rem' }}>Product no longer available</p>
                   )}
                 </div>
               ))}
             </div>
 
-            <div style={styles.divider} />
+            <hr style={{ border: 'none', borderTop: '1px solid var(--border)', margin: '1rem 0' }} />
 
-            <div style={styles.orderFooter}>
-              <p style={styles.itemCount}>
+            <div className="flex-between">
+              <p className="text-muted" style={{ fontSize: '0.9rem' }}>
                 {order.products.length} item{order.products.length > 1 ? 's' : ''}
               </p>
-              <p style={styles.totalAmount}>
-                Total: <span style={styles.totalValue}>
+              <p className="text-muted" style={{ fontSize: '1rem' }}>
+                Total: <span style={{ color: 'var(--primary)', fontSize: '1.25rem', fontWeight: '700', marginLeft: '0.5rem' }}>
                   ₹{order.totalAmount.toLocaleString()}
                 </span>
               </p>
@@ -175,165 +181,6 @@ function Orders() {
       </div>
     </div>
   )
-}
-
-const styles = {
-  container: {
-    padding: '40px',
-    backgroundColor: '#0f3460',
-    minHeight: '100vh',
-  },
-  heading: {
-    color: 'white',
-    fontSize: '32px',
-    marginBottom: '30px',
-    textAlign: 'center',
-  },
-  ordersList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-    maxWidth: '800px',
-    margin: '0 auto',
-  },
-  orderCard: {
-    backgroundColor: '#16213e',
-    borderRadius: '15px',
-    padding: '25px',
-    boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-  },
-  orderHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '15px',
-    flexWrap: 'wrap',
-    gap: '10px',
-  },
-  orderId: {
-    color: '#a8a8b3',
-    fontSize: '14px',
-    marginBottom: '5px',
-  },
-  orderIdValue: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontFamily: 'monospace',
-  },
-  orderDate: {
-    color: '#a8a8b3',
-    fontSize: '13px',
-  },
-  statusBadge: {
-    padding: '6px 14px',
-    borderRadius: '20px',
-    fontSize: '12px',
-    fontWeight: 'bold',
-    letterSpacing: '1px',
-  },
-  divider: {
-    height: '1px',
-    backgroundColor: '#0f346060',
-    margin: '15px 0',
-  },
-  productsList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  },
-  productRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '15px',
-  },
-  productImage: {
-    width: '60px',
-    height: '60px',
-    objectFit: 'cover',
-    borderRadius: '8px',
-  },
-  productInfo: {
-    flex: 1,
-  },
-  productName: {
-    color: 'white',
-    fontSize: '15px',
-    fontWeight: 'bold',
-    marginBottom: '4px',
-  },
-  productMeta: {
-    color: '#a8a8b3',
-    fontSize: '13px',
-  },
-  productTotal: {
-    color: '#e94560',
-    fontSize: '15px',
-    fontWeight: 'bold',
-  },
-  deletedProduct: {
-    color: '#a8a8b3',
-    fontSize: '14px',
-    fontStyle: 'italic',
-  },
-  orderFooter: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  itemCount: {
-    color: '#a8a8b3',
-    fontSize: '14px',
-  },
-  totalAmount: {
-    color: '#a8a8b3',
-    fontSize: '16px',
-  },
-  totalValue: {
-    color: '#e94560',
-    fontSize: '22px',
-    fontWeight: 'bold',
-  },
-  center: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '80vh',
-    backgroundColor: '#0f3460',
-  },
-  emptyBox: {
-    textAlign: 'center',
-    backgroundColor: '#16213e',
-    padding: '60px 80px',
-    borderRadius: '20px',
-  },
-  emptyIcon: {
-    fontSize: '80px',
-  },
-  emptyHeading: {
-    color: 'white',
-    fontSize: '28px',
-    marginBottom: '10px',
-  },
-  emptyText: {
-    color: '#a8a8b3',
-    fontSize: '16px',
-    marginBottom: '30px',
-  },
-  shopBtn: {
-    backgroundColor: '#e94560',
-    color: 'white',
-    padding: '12px 30px',
-    borderRadius: '10px',
-    textDecoration: 'none',
-    fontSize: '16px',
-    fontWeight: 'bold',
-  },
-  message: {
-    color: 'white',
-  },
-  errorMsg: {
-    color: '#e94560',
-  },
 }
 
 export default Orders

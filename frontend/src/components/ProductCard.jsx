@@ -2,10 +2,10 @@ import { useState } from 'react'
 import axios from 'axios'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import { ShoppingCart, Heart } from 'lucide-react'
 
 function ProductCard({ product, toggleWishlist, isWishlisted, setCartCount }) {
   const [addingToCart, setAddingToCart] = useState(false)
-  const [cartMessage, setCartMessage] = useState(null)
 
   const { token, user } = useAuth()
   const navigate = useNavigate()
@@ -17,7 +17,6 @@ function ProductCard({ product, toggleWishlist, isWishlisted, setCartCount }) {
     }
 
     setAddingToCart(true)
-    setCartMessage(null)
 
     try {
       await axios.post(
@@ -25,7 +24,6 @@ function ProductCard({ product, toggleWishlist, isWishlisted, setCartCount }) {
         { productId: product._id },
         { headers: { Authorization: `Bearer ${token}` } }
       )
-      setCartMessage('✅ Added!')
       if (setCartCount) {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/cart`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -33,154 +31,77 @@ function ProductCard({ product, toggleWishlist, isWishlisted, setCartCount }) {
         setCartCount(response.data.itemCount)
       }
     } catch (error) {
-      setCartMessage('❌ Failed!')
+      console.error(error)
     } finally {
       setAddingToCart(false)
-      setTimeout(() => setCartMessage(null), 2000)
     }
   }
 
   return (
-    <div style={styles.card}>
-      <div style={styles.imageContainer}>
+    <div className="card-minimal">
+      <div className="product-img-wrapper-minimal">
         <img
           src={product.image}
           alt={product.name}
-          style={styles.image}
+          className="product-img-minimal"
           onError={(e) => {
-            e.target.src = 'https://via.placeholder.com/300x200?text=No+Image'
+            e.target.src = 'https://placehold.co/300x400/f3f4f6/111827?text=No+Image'
           }}
         />
         <button
           onClick={() => toggleWishlist(product)}
-          style={styles.heartBtn}
-        >
-          {isWishlisted ? '❤️' : '🤍'}
-        </button>
-      </div>
-
-      <div style={styles.info}>
-        <h3 style={styles.name}>{product.name}</h3>
-        <p style={styles.description}>{product.description}</p>
-        <div style={styles.footer}>
-          <span style={styles.price}>
-            ₹{product.price.toLocaleString()}
-          </span>
-          <button
-            onClick={() => toggleWishlist(product)}
-            style={{
-              ...styles.wishlistBtn,
-              backgroundColor: isWishlisted ? '#e94560' : '#1a1a2e',
-            }}
-          >
-            {isWishlisted ? 'Wishlisted ❤️' : 'Wishlist 🤍'}
-          </button>
-        </div>
-
-        <button
-          onClick={handleAddToCart}
-          disabled={addingToCart}
           style={{
-            ...styles.cartBtn,
-            opacity: addingToCart ? 0.7 : 1,
+            position: 'absolute',
+            top: '0.75rem',
+            right: '0.75rem',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            zIndex: 10
           }}
         >
-          {addingToCart ? 'Adding...' : '🛒 Add to Cart'}
+          <Heart size={20} color={isWishlisted ? '#ef4444' : '#111827'} fill={isWishlisted ? '#ef4444' : 'none'} />
         </button>
-
-        {cartMessage && (
-          <p style={styles.cartMessage}>{cartMessage}</p>
-        )}
       </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 0.5rem' }}>
+        <div style={{ flex: 1, paddingRight: '1rem' }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.2rem' }}>
+            {product.name}
+          </h3>
+          <p style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)' }}>
+            ₹{product.price.toLocaleString()}
+          </p>
+        </div>
+        
+        <button
+          onClick={handleAddToCart}
+          disabled={addingToCart || product.stock === 0}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            cursor: addingToCart || product.stock === 0 ? 'not-allowed' : 'pointer',
+            opacity: addingToCart || product.stock === 0 ? 0.5 : 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '0.5rem'
+          }}
+          title={product.stock === 0 ? "Out of stock" : "Add to cart"}
+        >
+          {addingToCart ? (
+            <div style={{ width: 18, height: 18, border: '2px solid var(--text-main)', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+          ) : (
+            <ShoppingCart size={22} color="var(--text-main)" />
+          )}
+        </button>
+      </div>
+      
+      <style>{`
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+      `}</style>
     </div>
   )
-}
-
-const styles = {
-  card: {
-    backgroundColor: '#16213e',
-    borderRadius: '15px',
-    overflow: 'hidden',
-    boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-    width: '280px',
-  },
-  imageContainer: {
-    position: 'relative',
-  },
-  image: {
-    width: '100%',
-    height: '200px',
-    objectFit: 'cover',
-  },
-  heartBtn: {
-    position: 'absolute',
-    top: '10px',
-    right: '10px',
-    backgroundColor: 'white',
-    border: 'none',
-    borderRadius: '50%',
-    width: '40px',
-    height: '40px',
-    fontSize: '18px',
-    cursor: 'pointer',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  info: {
-    padding: '15px',
-  },
-  name: {
-    color: 'white',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    marginBottom: '8px',
-  },
-  description: {
-    color: '#a8a8b3',
-    fontSize: '13px',
-    marginBottom: '15px',
-    lineHeight: '1.5',
-  },
-  footer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '10px',
-  },
-  price: {
-    color: '#e94560',
-    fontSize: '18px',
-    fontWeight: 'bold',
-  },
-  wishlistBtn: {
-    color: 'white',
-    border: 'none',
-    padding: '8px 12px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '12px',
-    fontWeight: 'bold',
-  },
-  cartBtn: {
-    backgroundColor: '#0f3460',
-    color: 'white',
-    border: '1px solid #e94560',
-    padding: '10px',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    width: '100%',
-    marginTop: '5px',
-  },
-  cartMessage: {
-    textAlign: 'center',
-    marginTop: '8px',
-    fontSize: '13px',
-    color: '#a8a8b3',
-  },
 }
 
 export default ProductCard

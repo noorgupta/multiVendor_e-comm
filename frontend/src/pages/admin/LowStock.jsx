@@ -27,60 +27,68 @@ function LowStock() {
   }
 
   const getStockColor = (stock) => {
-    if (stock === 0) return '#e94560'
-    if (stock <= 3) return '#e74c3c'
-    return '#f39c12'
+    if (stock === 0) return '#ef4444' // Error Red
+    if (stock <= 3) return '#f59e0b' // Warning Amber
+    return '#10b981' // Success Emerald
   }
 
   if (loading) {
     return (
-      <div style={styles.center}>
-        <h2 style={styles.message}>⏳ Loading...</h2>
+      <div className="page-center">
+        <h2 className="heading-2 text-muted">⏳ Loading...</h2>
       </div>
     )
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <Link to='/admin' style={styles.backBtn}>← Back to Dashboard</Link>
-        <h1 style={styles.heading}>⚠️ Low Stock Products</h1>
+    <div className="container" style={{ minHeight: 'calc(100vh - 70px)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '2rem' }}>
+        <Link to='/admin' className="text-muted" style={{ fontWeight: '600' }}>← Back to Dashboard</Link>
+        <h1 className="heading-2" style={{ margin: 0 }}>Low Stock Products</h1>
       </div>
 
       {products.length === 0 ? (
-        <div style={styles.emptyBox}>
-          <p style={styles.emptyIcon}>✅</p>
-          <h2 style={styles.emptyHeading}>All products are well stocked!</h2>
+        <div className="form-container" style={{ textAlign: 'center', maxWidth: '500px' }}>
+          <p style={{ fontSize: '4rem', marginBottom: '1rem' }}>✅</p>
+          <h2 className="heading-3">All products are well stocked!</h2>
         </div>
       ) : (
-        <div style={styles.grid}>
+        <div className="grid-auto-fit">
           {products.map((product) => (
-            <div key={product._id} style={styles.card}>
+            <div key={product._id} className="card" style={{ display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}>
               <img
                 src={product.image}
                 alt={product.name}
-                style={styles.image}
+                style={{ width: '100%', height: '180px', objectFit: 'cover' }}
                 onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/150?text=No+Image'
+                  e.target.src = 'https://placehold.co/150x150/151A23/4f46e5?text=No+Image'
                 }}
               />
-              <div style={styles.info}>
-                <h3 style={styles.name}>{product.name}</h3>
-                <p style={styles.category}>{product.category}</p>
-                <p style={styles.price}>₹{product.price.toLocaleString()}</p>
+              <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
+                <h3 className="product-title" style={{ margin: 0 }}>{product.name}</h3>
+                <p className="text-muted" style={{ fontSize: '0.85rem', margin: 0 }}>{product.category}</p>
+                <p style={{ color: 'var(--primary)', fontSize: '1.2rem', fontWeight: 'bold', margin: 0 }}>₹{product.price.toLocaleString()}</p>
+                
                 <div style={{
-                  ...styles.stockBadge,
-                  backgroundColor: getStockColor(product.stock) + '20',
+                  padding: '0.5rem 1rem',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '0.85rem',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  backgroundColor: getStockColor(product.stock) + '15',
                   color: getStockColor(product.stock),
-                  border: `1px solid ${getStockColor(product.stock)}`,
+                  border: `1px solid ${getStockColor(product.stock)}40`,
+                  marginTop: 'auto'
                 }}>
                   {product.stock === 0
                     ? '❌ Out of Stock'
                     : `⚠️ Only ${product.stock} left!`}
                 </div>
+                
                 <Link
                   to={`/admin/products/edit/${product._id}`}
-                  style={styles.editBtn}
+                  className="btn btn-primary"
+                  style={{ width: '100%', textAlign: 'center', marginTop: '0.5rem' }}
                 >
                   ✏️ Update Stock
                 </Link>
@@ -91,109 +99,6 @@ function LowStock() {
       )}
     </div>
   )
-}
-
-const styles = {
-  container: {
-    padding: '40px',
-    backgroundColor: '#0f3460',
-    minHeight: '100vh',
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px',
-    marginBottom: '30px',
-  },
-  backBtn: {
-    color: '#a8a8b3',
-    textDecoration: 'none',
-    fontSize: '16px',
-  },
-  heading: {
-    color: 'white',
-    fontSize: '28px',
-    margin: 0,
-  },
-  grid: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '20px',
-    justifyContent: 'center',
-  },
-  card: {
-    backgroundColor: '#16213e',
-    borderRadius: '15px',
-    overflow: 'hidden',
-    width: '220px',
-    boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-  },
-  image: {
-    width: '100%',
-    height: '150px',
-    objectFit: 'cover',
-  },
-  info: {
-    padding: '15px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  name: {
-    color: 'white',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    margin: 0,
-  },
-  category: {
-    color: '#a8a8b3',
-    fontSize: '12px',
-    margin: 0,
-  },
-  price: {
-    color: '#e94560',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    margin: 0,
-  },
-  stockBadge: {
-    padding: '6px 10px',
-    borderRadius: '8px',
-    fontSize: '12px',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  editBtn: {
-    backgroundColor: '#e94560',
-    color: 'white',
-    padding: '8px',
-    borderRadius: '8px',
-    textDecoration: 'none',
-    fontSize: '13px',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  emptyBox: {
-    textAlign: 'center',
-    padding: '60px',
-  },
-  emptyIcon: {
-    fontSize: '60px',
-  },
-  emptyHeading: {
-    color: 'white',
-    fontSize: '24px',
-  },
-  center: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '80vh',
-    backgroundColor: '#0f3460',
-  },
-  message: {
-    color: 'white',
-  },
 }
 
 export default LowStock

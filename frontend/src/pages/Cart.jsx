@@ -8,8 +8,8 @@ function Cart({ setCartCount }) {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [placingOrder, setPlacingOrder] = useState(false)      // ← NEW
-  const [orderMessage, setOrderMessage] = useState(null)        // ← NEW
+  const [placingOrder, setPlacingOrder] = useState(false)
+  const [orderMessage, setOrderMessage] = useState(null)
 
   const { token, user } = useAuth()
   const navigate = useNavigate()
@@ -28,13 +28,11 @@ function Cart({ setCartCount }) {
         `${import.meta.env.VITE_API_URL}/api/cart`,
         { headers: { Authorization: `Bearer ${token}` } }
       )
-      console.log('Cart data:', response.data)
       setCartItems(response.data.cartItems || [])
       setTotal(response.data.total || 0)
       setCartCount(response.data.itemCount || 0)
       setLoading(false)
     } catch (error) {
-      console.log('Cart fetch error:', error.response?.data)
       setError('Failed to load cart!')
       setLoading(false)
     }
@@ -61,10 +59,7 @@ function Cart({ setCartCount }) {
       `${import.meta.env.VITE_API_URL}/api/cart/${cartItemId}`,
       { action },
       { headers: { Authorization: `Bearer ${token}` } }
-    ).catch((error) => {
-      console.log('Update error:', error.response?.data)
-      fetchCart()
-    })
+    ).catch(() => fetchCart())
   }
 
   const removeItem = (cartItemId) => {
@@ -80,13 +75,10 @@ function Cart({ setCartCount }) {
     axios.delete(
       `${import.meta.env.VITE_API_URL}/api/cart/${cartItemId}`,
       { headers: { Authorization: `Bearer ${token}` } }
-    ).catch((error) => {
-      console.log('Remove error:', error.response?.data)
-      fetchCart()
-    })
+    ).catch(() => fetchCart())
   }
 
-  const handlePlaceOrder = async () => {       // ← NEW
+  const handlePlaceOrder = async () => {
     try {
       setPlacingOrder(true)
       setOrderMessage(null)
@@ -115,28 +107,28 @@ function Cart({ setCartCount }) {
 
   if (loading) {
     return (
-      <div style={styles.center}>
-        <h2 style={styles.message}>⏳ Loading cart...</h2>
+      <div className="page-center">
+        <h2 className="heading-2 text-muted">⏳ Loading cart...</h2>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div style={styles.center}>
-        <h2 style={styles.errorMsg}>{error}</h2>
+      <div className="page-center">
+        <h2 className="heading-2 text-error">{error}</h2>
       </div>
     )
   }
 
   if (cartItems.length === 0) {
     return (
-      <div style={styles.center}>
-        <div style={styles.emptyBox}>
-          <p style={styles.emptyIcon}>🛒</p>
-          <h2 style={styles.emptyHeading}>Your Cart is Empty!</h2>
-          <p style={styles.emptyText}>Add some products to your cart</p>
-          <Link to='/' style={styles.shopBtn}>
+      <div className="page-center">
+        <div className="form-container" style={{ margin: '0', textAlign: 'center', maxWidth: '500px' }}>
+          <p style={{ fontSize: '4rem', marginBottom: '1rem' }}>🛒</p>
+          <h2 className="heading-2" style={{ marginBottom: '0.5rem' }}>Your Cart is Empty!</h2>
+          <p className="text-muted mb-4">Add some products to your cart</p>
+          <Link to='/' className="btn btn-primary" style={{ display: 'inline-block' }}>
             🛍️ Start Shopping
           </Link>
         </div>
@@ -145,52 +137,56 @@ function Cart({ setCartCount }) {
   }
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.heading}>
-        🛒 My Cart ({cartItems.length} items)
+    <div className="container" style={{ minHeight: 'calc(100vh - 70px)' }}>
+      <h1 className="heading-1 text-center" style={{ marginBottom: '3rem' }}>
+        My Cart ({cartItems.length} items)
       </h1>
-      <div style={styles.cartLayout}>
-        <div style={styles.itemsList}>
+      
+      <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start', flexWrap: 'wrap', justifyContent: 'center' }}>
+        
+        <div style={{ flex: '1', minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {cartItems.map((item) => {
             if (!item.product) return null
 
             return (
-              <div key={item._id} style={styles.cartItem}>
+              <div key={item._id} className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap', padding: '1.25rem' }}>
                 <img
                   src={item.product.image}
                   alt={item.product.name}
-                  style={styles.image}
-                  onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/80x80?text=No+Image'
-                  }}
+                  style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: 'var(--radius-sm)' }}
+                  onError={(e) => { e.target.src = 'https://placehold.co/80x80/151A23/4f46e5?text=No+Image' }}
                 />
-                <div style={styles.itemInfo}>
-                  <h3 style={styles.itemName}>{item.product.name}</h3>
-                  <p style={styles.itemPrice}>
+                
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '0.25rem' }}>{item.product.name}</h3>
+                  <p className="text-muted" style={{ fontSize: '0.9rem' }}>
                     ₹{item.product.price.toLocaleString()}
                   </p>
                 </div>
-                <div style={styles.quantityControl}>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'var(--bg-gray)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}>
                   <button
                     onClick={() => updateQuantity(item._id, 'decrease')}
-                    style={styles.qtyBtn}
+                    style={{ background: 'transparent', color: 'var(--text-main)', border: 'none', fontSize: '1.25rem', cursor: 'pointer', padding: '0 0.5rem' }}
                   >
                     −
                   </button>
-                  <span style={styles.quantity}>{item.quantity}</span>
+                  <span style={{ fontWeight: 'bold', minWidth: '20px', textAlign: 'center' }}>{item.quantity}</span>
                   <button
                     onClick={() => updateQuantity(item._id, 'increase')}
-                    style={styles.qtyBtn}
+                    style={{ background: 'transparent', color: 'var(--text-main)', border: 'none', fontSize: '1.25rem', cursor: 'pointer', padding: '0 0.5rem' }}
                   >
                     +
                   </button>
                 </div>
-                <p style={styles.itemTotal}>
+                
+                <p style={{ color: 'var(--primary)', fontSize: '1.1rem', fontWeight: '700', minWidth: '100px', textAlign: 'right' }}>
                   ₹{(item.product.price * item.quantity).toLocaleString()}
                 </p>
+                
                 <button
                   onClick={() => removeItem(item._id)}
-                  style={styles.deleteBtn}
+                  style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '0.5rem' }}
                 >
                   🗑️
                 </button>
@@ -199,221 +195,35 @@ function Cart({ setCartCount }) {
           })}
         </div>
 
-        <div style={styles.summary}>
-          <h2 style={styles.summaryHeading}>Order Summary</h2>
-          <div style={styles.summaryRow}>
-            <span style={styles.summaryLabel}>Items:</span>
-            <span style={styles.summaryValue}>{cartItems.length}</span>
+        <div className="card" style={{ width: '320px', padding: '1.75rem', position: 'sticky', top: '100px' }}>
+          <h2 className="heading-3" style={{ marginBottom: '1.5rem' }}>Order Summary</h2>
+          <div className="flex-between mb-3">
+            <span className="text-muted">Items:</span>
+            <span style={{ fontWeight: '600' }}>{cartItems.length}</span>
           </div>
-          <div style={styles.summaryRow}>
-            <span style={styles.summaryLabel}>Total:</span>
-            <span style={styles.totalPrice}>
+          <div className="flex-between mb-4">
+            <span className="text-muted">Total:</span>
+            <span style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: '700' }}>
               ₹{total.toLocaleString()}
             </span>
           </div>
           <button                                    
             onClick={handlePlaceOrder}
             disabled={placingOrder}
-            style={{
-              ...styles.checkoutBtn,
-              opacity: placingOrder ? 0.7 : 1,
-            }}
+            className="btn btn-primary"
+            style={{ width: '100%', opacity: placingOrder ? 0.7 : 1, padding: '1rem' }}
           >
             {placingOrder ? '⏳ Placing Order...' : '🛒 Place Order'}
           </button>
           {orderMessage && (
-            <p style={styles.orderMessage}>{orderMessage}</p>
+            <p className="text-center mt-3" style={{ color: orderMessage.includes('❌') ? 'var(--error)' : 'var(--success)', fontWeight: '600', fontSize: '0.9rem' }}>
+              {orderMessage}
+            </p>
           )}
         </div>
       </div>
     </div>
   )
-}
-
-const styles = {
-  container: {
-    padding: '40px',
-    backgroundColor: '#0f3460',
-    minHeight: '100vh',
-  },
-  heading: {
-    color: 'white',
-    fontSize: '32px',
-    marginBottom: '30px',
-    textAlign: 'center',
-  },
-  cartLayout: {
-    display: 'flex',
-    gap: '30px',
-    alignItems: 'flex-start',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  itemsList: {
-    flex: 1,
-    minWidth: '300px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px',
-  },
-  cartItem: {
-    backgroundColor: '#16213e',
-    borderRadius: '15px',
-    padding: '20px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px',
-    flexWrap: 'wrap',
-  },
-  image: {
-    width: '80px',
-    height: '80px',
-    objectFit: 'cover',
-    borderRadius: '10px',
-  },
-  itemInfo: {
-    flex: 1,
-  },
-  itemName: {
-    color: 'white',
-    fontSize: '16px',
-    marginBottom: '5px',
-  },
-  itemPrice: {
-    color: '#a8a8b3',
-    fontSize: '14px',
-  },
-  quantityControl: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    backgroundColor: '#0f3460',
-    padding: '8px 15px',
-    borderRadius: '10px',
-  },
-  qtyBtn: {
-    backgroundColor: '#e94560',
-    color: 'white',
-    border: 'none',
-    width: '28px',
-    height: '28px',
-    borderRadius: '50%',
-    cursor: 'pointer',
-    fontSize: '18px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  quantity: {
-    color: 'white',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    minWidth: '20px',
-    textAlign: 'center',
-  },
-  itemTotal: {
-    color: '#e94560',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    minWidth: '100px',
-    textAlign: 'right',
-  },
-  deleteBtn: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    fontSize: '20px',
-    cursor: 'pointer',
-  },
-  summary: {
-    backgroundColor: '#16213e',
-    borderRadius: '15px',
-    padding: '30px',
-    width: '300px',
-    boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-  },
-  summaryHeading: {
-    color: 'white',
-    fontSize: '20px',
-    marginBottom: '20px',
-  },
-  summaryRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '15px',
-  },
-  summaryLabel: {
-    color: '#a8a8b3',
-    fontSize: '16px',
-  },
-  summaryValue: {
-    color: 'white',
-    fontSize: '16px',
-  },
-  totalPrice: {
-    color: '#e94560',
-    fontSize: '22px',
-    fontWeight: 'bold',
-  },
-  checkoutBtn: {
-    backgroundColor: '#e94560',
-    color: 'white',
-    border: 'none',
-    padding: '14px',
-    borderRadius: '10px',
-    width: '100%',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    marginTop: '20px',
-  },
-  orderMessage: {                              // ← NEW
-    textAlign: 'center',
-    marginTop: '15px',
-    fontSize: '14px',
-    color: '#2ecc71',
-    fontWeight: 'bold',
-  },
-  center: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '80vh',
-    backgroundColor: '#0f3460',
-  },
-  emptyBox: {
-    textAlign: 'center',
-    backgroundColor: '#16213e',
-    padding: '60px 80px',
-    borderRadius: '20px',
-  },
-  emptyIcon: {
-    fontSize: '80px',
-  },
-  emptyHeading: {
-    color: 'white',
-    fontSize: '28px',
-    marginBottom: '10px',
-  },
-  emptyText: {
-    color: '#a8a8b3',
-    fontSize: '16px',
-    marginBottom: '30px',
-  },
-  shopBtn: {
-    backgroundColor: '#e94560',
-    color: 'white',
-    padding: '12px 30px',
-    borderRadius: '10px',
-    textDecoration: 'none',
-    fontSize: '16px',
-    fontWeight: 'bold',
-  },
-  message: {
-    color: 'white',
-  },
-  errorMsg: {
-    color: '#e94560',
-  },
 }
 
 export default Cart
