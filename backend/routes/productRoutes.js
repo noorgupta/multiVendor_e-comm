@@ -7,11 +7,13 @@ const {
   updateProduct,
   deleteProduct,
   getLowStockProducts,
+  getMyProducts
 } = require('../controllers/productController');
 const { protect, authorizeRoles } = require('../middleware/authMiddleware');
 
 // ─── Public Routes ───────────────────────────────
 router.get('/', getProducts);
+router.get('/my-products',protect,authorizeRoles('admin'),getMyProducts);
 router.get('/low-stock', protect, authorizeRoles('admin'), getLowStockProducts);
 router.get('/:id', getProductById);
 

@@ -20,7 +20,7 @@ const getProducts = async (req, res) => {
     }
 
     const total = await Product.countDocuments(query);
-    const products = await Product.find(query)
+    const products = await Product.find()
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
@@ -67,6 +67,7 @@ const createProduct = async (req, res) => {
       description,
       stock: stock || 10,
       category,
+      vendor: req.user._id
     });
 
     res.status(201).json(product);
@@ -135,6 +136,21 @@ const getLowStockProducts = async (req, res) => {
   }
 };
 
+const getMyProducts = async (req, res) => {
+  try {
+    const products = await Product.find({
+      vendor: req.user._id,
+    });
+
+    res.json(products);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Error fetching vendor products",
+    });
+  }
+};
+
 module.exports = {
   getProducts,
   getProductById,
@@ -142,4 +158,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getLowStockProducts,
+  getMyProducts
 };
